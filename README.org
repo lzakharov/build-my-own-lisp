@@ -9,7 +9,7 @@
    - [X] Chapter 4 • An Interactive Prompt
    - [X] Chapter 5 • Languages
    - [X] Chapter 6 • Parsing
-   - [ ] Chapter 7 • Evaluation
+   - [X] Chapter 7 • Evaluation
    - [ ] Chapter 8 • Error Handling
    - [ ] Chapter 9 • S-Expressions
    - [ ] Chapter 10 • Q-Expressions
