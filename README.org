@@ -1,0 +1,22 @@
+* Build My Own Lisp
+  Learning C and building my own programming language with the book
+  [[http://www.buildyourownlisp.com]["Build Your Own Lisp"]].
+  
+** Progress
+   - [X] Chapter 1 • Introduction
+   - [X] Chapter 2 • Installation
+   - [X] Chapter 3 • Basics
+   - [ ] Chapter 4 • An Interactive Prompt
+   - [ ] Chapter 5 • Languages
+   - [ ] Chapter 6 • Parsing
+   - [ ] Chapter 7 • Evaluation
+   - [ ] Chapter 8 • Error Handling
+   - [ ] Chapter 9 • S-Expressions
+   - [ ] Chapter 10 • Q-Expressions
+   - [ ] Chapter 11 • Variables
+   - [ ] Chapter 12 • Functions
+   - [ ] Chapter 13 • Conditionals
+   - [ ] Chapter 14 • Strings
+   - [ ] Chapter 15 • Standard Library
+   - [ ] Chapter 16 • Bonus Projects
+
