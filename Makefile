@@ -1,7 +1,7 @@
 src = $(wildcard src/*.c)
 obj = $(src:.c=.o)
 
-LDFLAGS = -ledit
+LDFLAGS = -ledit -lm
 
 lispy: $(obj)
 	$(CC) -o $@ $^ $(LDFLAGS)
