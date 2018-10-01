@@ -6,7 +6,7 @@
    - [X] Chapter 1 • Introduction
    - [X] Chapter 2 • Installation
    - [X] Chapter 3 • Basics
-   - [ ] Chapter 4 • An Interactive Prompt
+   - [X] Chapter 4 • An Interactive Prompt
    - [ ] Chapter 5 • Languages
    - [ ] Chapter 6 • Parsing
    - [ ] Chapter 7 • Evaluation
