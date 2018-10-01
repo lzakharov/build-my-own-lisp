@@ -46,7 +46,16 @@ lispy    : /^/ <operator> <expr>+ /$/ ;				  \
   while (1) {
     char* input = readline("lispy> ");
     add_history(input);
-    printf("No you're a %s\n", input);
+
+    mpc_result_t r;
+    if (mpc_parse("<stdin>", input, Lispy, &r)) {
+      mpc_ast_print(r.output);
+      mpc_ast_delete(r.output);
+    } else {
+      mpc_err_print(r.error);
+      mpc_err_delete(r.error);
+    }
+    
     free(input);
   }
 
