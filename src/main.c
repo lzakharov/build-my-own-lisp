@@ -30,7 +30,7 @@ void read_eval_print(const parser_grammar* g, const char* input);
 int main(int argc, char** argv) {
   parser_grammar* g = parser_init();
 
-  puts("Lispy Version 0.0.0.0.5");
+  puts("Lispy Version 0.0.0.0.6");
   puts("Press Ctrl+C to Exit\n");
 
   while (1) {
