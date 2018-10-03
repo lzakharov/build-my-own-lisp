@@ -1,7 +1,13 @@
 * Build My Own Lisp
   Learning C and building my own programming language with the book
   [[http://www.buildyourownlisp.com]["Build Your Own Lisp"]].
-  
+ 
+** Building
+   Just run:
+   #+BEGIN_SRC shell 
+   make
+   #+END_SRC
+
 ** Progress
    - [X] Chapter 1 • Introduction
    - [X] Chapter 2 • Installation
@@ -10,7 +16,7 @@
    - [X] Chapter 5 • Languages
    - [X] Chapter 6 • Parsing
    - [X] Chapter 7 • Evaluation
-   - [ ] Chapter 8 • Error Handling
+   - [X] Chapter 8 • Error Handling
    - [ ] Chapter 9 • S-Expressions
    - [ ] Chapter 10 • Q-Expressions
    - [ ] Chapter 11 • Variables

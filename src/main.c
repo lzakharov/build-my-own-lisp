@@ -28,7 +28,7 @@ void add_history(char* input) {}
 int main(int argc, char** argv) {
   parser_grammar* g = parser_init();
 
-  puts("Lispy Version 0.0.0.0.4");
+  puts("Lispy Version 0.0.0.0.5");
   puts("Press Ctrl+C to Exit\n");
 
   while (1) {
