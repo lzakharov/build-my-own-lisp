@@ -1,17 +1,25 @@
 #include "eval.h"
+
+#include <stdio.h>
+
 #include "mpc.h"
 #include "parser.h"
 
-void eval_print(const char* input) {
+void eval_print(const parser_grammar* g, const char* input) {
   mpc_result_t r;
-  if (parser_parse("<stdin>", input, &r)) {
+  if (parser_parse("<stdin>", input, g, &r)) {
     long result = eval(r.output);
-    printf("%li\n", result);
+    printf("%li", result);
     mpc_ast_delete(r.output);
   } else {
     mpc_err_print(r.error);
     mpc_err_delete(r.error);
   }
+}
+
+void eval_println(const parser_grammar* g, const char* input) {
+  eval_print(g, input);
+  putchar('\n');
 }
 
 long eval_op(const long x, const char* op, const long y) {

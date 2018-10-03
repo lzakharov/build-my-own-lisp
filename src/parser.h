@@ -9,13 +9,16 @@ static const char* LANG =
   "expr     : <number> | '(' <operator> <expr>+ ')' ;"
   "lispy    : /^/ <operator> <expr>+ /$/ ;";
 
-static mpc_parser_t* parser_number = NULL;
-static mpc_parser_t* parser_operator = NULL;
-static mpc_parser_t* parser_expr = NULL;
-static mpc_parser_t* parser_lispy = NULL;
+typedef struct {
+    mpc_parser_t* number;
+    mpc_parser_t* operator;
+    mpc_parser_t* expr;
+    mpc_parser_t* lispy;
+} parser_grammar;
 
-void parser_init();
-int parser_parse(const char* filename, const char* string, mpc_result_t* r);
+parser_grammar* parser_init();
+int parser_parse(const char* filename, const char* string, const parser_grammar* g,
+		 mpc_result_t* r);
 void parser_cleanup();
 
 #endif

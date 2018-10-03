@@ -1,23 +1,23 @@
 #include "parser.h"
+
 #include "mpc.h"
 
-void parser_init() {
-  mpc_parser_t* number = mpc_new("number");
-  mpc_parser_t* operator = mpc_new("operator");
-  mpc_parser_t* expr = mpc_new("expr");
-  mpc_parser_t* lispy = mpc_new("lispy");
-
-  mpca_lang(MPCA_LANG_DEFAULT, LANG, number, operator, expr, lispy);
-  parser_number = number;
-  parser_operator = operator;
-  parser_expr = expr;
-  parser_lispy = lispy;
+parser_grammar* parser_init() {
+  parser_grammar* g = malloc(sizeof(parser_grammar));
+  g->number = mpc_new("number");
+  g->operator = mpc_new("operator");
+  g->expr = mpc_new("expr");
+  g->lispy = mpc_new("lispy");
+  mpca_lang(MPCA_LANG_DEFAULT, LANG, g->number, g->operator, g->expr, g->lispy);
+  return g;
 }
 
-int parser_parse(const char* filename, const char* string, mpc_result_t* r) {
-  return mpc_parse(filename, string, parser_lispy, r);
+int parser_parse(const char* filename, const char* string, const parser_grammar* g,
+		 mpc_result_t* r) {
+  return mpc_parse(filename, string, g->lispy, r);
 }
 
-void parser_cleanup() {
-  mpc_cleanup(4, parser_number, parser_operator, parser_expr, parser_lispy);
+void parser_cleanup(parser_grammar* g) {
+  mpc_cleanup(4, g->number, g->operator, g->expr, g->lispy);
+  free(g);
 }
