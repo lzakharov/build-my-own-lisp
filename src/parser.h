@@ -5,7 +5,8 @@
 
 static const char* LANG =
   "number   : /-?[0-9]+/ ;"
-  "symbol   : '+' | '-' | '*' | '/' ;"
+  "symbol   : '+' | '-' | '*' | '/' "
+  "         | \"list\" | \"head\" | \"tail\" | \"join\" | \"eval\" ;"
   "sexpr    : '(' <expr>* ')' ;"
   "qexpr    : '{' <expr>* '}' ;"
   "expr     : <number> | <symbol> | <sexpr> | <qexpr> ;"

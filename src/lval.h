@@ -25,14 +25,14 @@ void lval_del(lval* v);
 
 lval* lval_read_num(const mpc_ast_t* t);
 lval* lval_read(const mpc_ast_t* t);
+
 lval* lval_add(lval* v, const lval* x);
+lval* lval_join(lval* x, lval* y);
 
 lval* lval_eval_sexpr(lval* v);
 lval* lval_eval(lval* v);
 lval* lval_pop(lval* v, const int i);
 lval* lval_take(lval* v, const int i);
-
-lval* builtin_op(lval* a, char* op);
 
 void lval_expr_print(const lval* v, const char open, const char close);
 void lval_print(const lval* v);
