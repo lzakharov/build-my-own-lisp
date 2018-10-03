@@ -28,6 +28,14 @@ lval* lval_sexpr(void) {
   return v;
 }
 
+lval* lval_qexpr(void) {
+  lval* v = malloc(sizeof(lval));
+  v->type = LVAL_QEXPR;
+  v->count = 0;
+  v->cell = NULL;
+  return v;
+}
+
 lval* lval_err(const char* m) {
   lval* v = malloc(sizeof(lval));
   v->type = LVAL_ERR;
@@ -42,6 +50,7 @@ void lval_del(lval* v) {
   case LVAL_SYM: free(v->sym); break;
   case LVAL_ERR: free(v->err); break;
   case LVAL_SEXPR:
+  case LVAL_QEXPR:
     for (int i = 0; i < v->count; ++i) {
       lval_del(v->cell[i]);
     }
@@ -66,11 +75,14 @@ lval* lval_read(const mpc_ast_t* t) {
   if (strcmp(t->tag, ">") == 0 || strstr(t->tag, "sexpr")) {
     x = lval_sexpr();
   }
+  if (strstr(t->tag, "qexpr")) { x = lval_qexpr(); }
 
   for (int i = 0; i < t->children_num; ++i) {
     mpc_ast_t* child = t->children[i];
     if (strcmp(child->contents, "(") == 0 ||
   	strcmp(child->contents, ")") == 0 ||
+  	strcmp(child->contents, "{") == 0 ||
+  	strcmp(child->contents, "}") == 0 ||
   	strcmp(child->tag, "regex") == 0) {
       continue;
     }
@@ -166,7 +178,7 @@ lval* builtin_op(lval* a, char* op) {
   return x;
 }
 
-void lval_sexpr_print(const lval* v, const char open, const char close) {
+void lval_expr_print(const lval* v, const char open, const char close) {
   putchar(open);
 
   for (int i = 0; i < v->count; ++i) {
@@ -184,7 +196,8 @@ void lval_print(const lval* v) {
   switch (v->type) {
   case LVAL_NUM: printf("%li", v->num); break;
   case LVAL_SYM: printf("%s", v->sym); break;
-  case LVAL_SEXPR: lval_sexpr_print(v, '(', ')'); break;
+  case LVAL_SEXPR: lval_expr_print(v, '(', ')'); break;
+  case LVAL_QEXPR: lval_expr_print(v, '{', '}'); break;
   case LVAL_ERR: printf("Error: %s", v->err); break;
   }
 }
