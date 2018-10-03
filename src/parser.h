@@ -5,20 +5,22 @@
 
 static const char* LANG =
   "number   : /-?[0-9]+/ ;"
-  "operator : '+' | '-' | '*' | '/' ;"
-  "expr     : <number> | '(' <operator> <expr>+ ')' ;"
-  "lispy    : /^/ <operator> <expr>+ /$/ ;";
+  "symbol   : '+' | '-' | '*' | '/' ;"
+  "sexpr    : '(' <expr>* ')' ;"
+  "expr     : <number> | <symbol> | <sexpr> ;"
+  "lispy    : /^/ <expr>* /$/ ;";
 
 typedef struct {
     mpc_parser_t* number;
-    mpc_parser_t* operator;
+    mpc_parser_t* symbol;
+    mpc_parser_t* sexpr;
     mpc_parser_t* expr;
     mpc_parser_t* lispy;
 } parser_grammar;
 
-parser_grammar* parser_init();
+parser_grammar* parser_init(void);
 int parser_parse(const char* filename, const char* string, const parser_grammar* g,
 		 mpc_result_t* r);
-void parser_cleanup();
+void parser_cleanup(parser_grammar* g);
 
 #endif

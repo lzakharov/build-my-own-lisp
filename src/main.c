@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
 #include "parser.h"
-#include "eval.h"
+#include "lval.h"
 
 #ifdef _WIN32
 #include <string.h>
@@ -34,10 +34,21 @@ int main(int argc, char** argv) {
   while (1) {
     char* input = readline("lispy> ");
     add_history(input);
-    eval_println(g, input);
+
+    mpc_result_t r;
+    if (parser_parse("<stdin>", input, g, &r)) {
+      lval* x = lval_eval(lval_read(r.output)); 
+      lval_println(x);
+      lval_del(x);
+      mpc_ast_delete(r.output);
+    } else {
+      mpc_err_print(r.error);
+      mpc_err_delete(r.error);
+    }
+
     free(input);
   }
 
-  parser_cleanup();
+  parser_cleanup(g);
   return 0;
 }
