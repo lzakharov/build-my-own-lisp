@@ -25,6 +25,8 @@ void add_history(char* input) {}
 #include <editline/history.h>
 #endif
 
+void read_eval_print(const parser_grammar* g, const char* input);
+
 int main(int argc, char** argv) {
   parser_grammar* g = parser_init();
 
@@ -35,20 +37,25 @@ int main(int argc, char** argv) {
     char* input = readline("lispy> ");
     add_history(input);
 
-    mpc_result_t r;
-    if (parser_parse("<stdin>", input, g, &r)) {
-      lval* x = lval_eval(lval_read(r.output)); 
-      lval_println(x);
-      lval_del(x);
-      mpc_ast_delete(r.output);
-    } else {
-      mpc_err_print(r.error);
-      mpc_err_delete(r.error);
-    }
+    read_eval_print(g, input);
 
     free(input);
   }
 
   parser_cleanup(g);
   return 0;
+}
+
+void read_eval_print(const parser_grammar* g, const char* input) {
+  mpc_result_t r;
+
+  if (parser_parse("<stdin>", input, g, &r)) {
+    lval* x = lval_eval(lval_read(r.output)); 
+    lval_println(x);
+    lval_del(x);
+    mpc_ast_delete(r.output);
+  } else {
+    mpc_err_print(r.error);
+    mpc_err_delete(r.error);
+  }
 }
