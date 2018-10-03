@@ -4,12 +4,13 @@
 
 #include "mpc.h"
 #include "parser.h"
+#include "lval.h"
 
 void eval_print(const parser_grammar* g, const char* input) {
   mpc_result_t r;
   if (parser_parse("<stdin>", input, g, &r)) {
-    long result = eval(r.output);
-    printf("%li", result);
+    lval result = eval(r.output);
+    lval_print(result);
     mpc_ast_delete(r.output);
   } else {
     mpc_err_print(r.error);
@@ -22,21 +23,29 @@ void eval_println(const parser_grammar* g, const char* input) {
   putchar('\n');
 }
 
-long eval_op(const long x, const char* op, const long y) {
-  if (strcmp(op, "+") == 0) { return x + y; };
-  if (strcmp(op, "-") == 0) { return x - y; };
-  if (strcmp(op, "*") == 0) { return x * y; };
-  if (strcmp(op, "/") == 0) { return x / y; };
-  return 0;
+lval eval_op(const lval x, const char* op, const lval y) {
+  if (x.type == LVAL_ERR) { return x; };
+  if (y.type == LVAL_ERR) { return x; };
+
+  if (strcmp(op, "+") == 0) { return lval_num(x.num + y.num); };
+  if (strcmp(op, "-") == 0) { return lval_num(x.num - y.num); };
+  if (strcmp(op, "*") == 0) { return lval_num(x.num * y.num); };
+  if (strcmp(op, "/") == 0) {
+    return y.num == 0 ? lval_err(LERR_DIV_ZERO) : lval_num(x.num / y.num);
+  };
+
+  return lval_err(LERR_BAD_OP);
 }
 
-long eval(const mpc_ast_t* t) {
+lval eval(const mpc_ast_t* t) {
   if (strstr(t->tag, "number")) {
-    return atoi(t->contents);
+    errno = 0;
+    long x = strtol(t->contents, NULL, 10);
+    return errno != ERANGE ? lval_num(x) : lval_err(LERR_BAD_NUM);
   }
 
   char* op = t->children[1]->contents;
-  long x = eval(t->children[2]);
+  lval x = eval(t->children[2]);
 
   int i = 3;
   while (strstr(t->children[i]->tag, "expr")) {
