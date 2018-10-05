@@ -137,8 +137,8 @@ lval* lval_copy(const lval* v) {
   case LVAL_QEXPR:
     x->count = v->count;
     x->cell = malloc(sizeof(lval*) * x->count);
-    for (int i = 0; i < x->count; ++x) {
-      x->cell[i] = v->cell[i];
+    for (int i = 0; i < x->count; ++i) {
+      x->cell[i] = lval_copy(v->cell[i]);
     }
     break;
   }
@@ -146,7 +146,7 @@ lval* lval_copy(const lval* v) {
   return x;
 }
 
-lval* lval_eval_sexpr(const lenv* e, lval* v) {
+lval* lval_eval_sexpr(lenv* e, lval* v) {
   for (int i = 0; i < v->count; ++i) {
     v->cell[i] = lval_eval(e, v->cell[i]);
   }
@@ -169,7 +169,7 @@ lval* lval_eval_sexpr(const lenv* e, lval* v) {
   return result;
 }
 
-lval* lval_eval(const lenv* e, lval* v) {
+lval* lval_eval(lenv* e, lval* v) {
   if (v->type == LVAL_SYM) {
     lval* x = lenv_get(e, v);
     lval_del(v);

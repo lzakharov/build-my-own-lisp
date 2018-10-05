@@ -4,13 +4,17 @@
 #include "lval.h"
 
 struct lval;
+struct lenv;
 typedef struct lval lval;
+typedef struct lenv lenv;
 
-typedef struct lenv {
+typedef lval*(*lbuiltin)(lenv*, lval*);
+
+struct lenv {
   int count;
   char** syms;
   lval** vals;
-} lenv;
+};
 
 lenv* lenv_new(void);
 void lenv_del(lenv* e);

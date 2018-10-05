@@ -12,7 +12,7 @@ typedef struct lenv lenv;
 typedef enum { LVAL_NUM, LVAL_SYM, LVAL_FUN,
                LVAL_SEXPR, LVAL_QEXPR, LVAL_ERR } lval_t;
 
-typedef lval*(*lbuiltin)(const lenv*, lval*);
+typedef lval*(*lbuiltin)(lenv*, lval*);
 
 struct lval {
   lval_t type;
@@ -41,8 +41,8 @@ lval* lval_add(lval* v, const lval* x);
 lval* lval_join(lval* x, lval* y);
 lval* lval_copy(const lval* v);
 
-lval* lval_eval_sexpr(const lenv* e, lval* v);
-lval* lval_eval(const lenv* e, lval* v);
+lval* lval_eval_sexpr(lenv* e, lval* v);
+lval* lval_eval(lenv* e, lval* v);
 lval* lval_pop(lval* v, const int i);
 lval* lval_take(lval* v, const int i);
 
