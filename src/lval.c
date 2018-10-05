@@ -5,6 +5,7 @@
 
 #include "mpc.h"
 #include "lenv.h"
+#include "ltype.h"
 #include "builtin.h"
 
 lval* lval_num(const long x) {
@@ -45,11 +46,18 @@ lval* lval_qexpr(void) {
   return v;
 }
 
-lval* lval_err(const char* m) {
+lval* lval_err(char* fmt, ...) {
   lval* v = malloc(sizeof(lval));
   v->type = LVAL_ERR;
-  v->err = malloc(strlen(m) + 1);
-  strcpy(v->err, m);
+
+  va_list va;
+  va_start(va, fmt);
+
+  v->err = malloc(512);
+  vsnprintf(v->err, 511, fmt, va);
+  v->err = realloc(v->err, strlen(v->err) + 1);
+  va_end(va);
+
   return v;
 }
 
@@ -160,8 +168,12 @@ lval* lval_eval_sexpr(lenv* e, lval* v) {
 
   lval* f = lval_pop(v, 0);
   if (f->type != LVAL_FUN) {
-    lval_del(f); lval_del(v);
-    return lval_err("first element is not a function");
+    lval* err = lval_err("S-Expression starts with incorrect type. "
+                         "Got %s, Expected %s.",
+                         ltype_name(f->type), ltype_name(LVAL_FUN));
+    lval_del(f);
+    lval_del(v);
+    return err;
   }
 
   lval* result = f->fun(e, v);

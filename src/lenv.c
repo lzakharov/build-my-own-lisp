@@ -28,7 +28,7 @@ lval* lenv_get(const lenv* e, const lval* k) {
     }
   }
 
-  return lval_err("unbound symbol!");
+  return lval_err("Unbound Symbol '%s'", k->sym);
 }
 
 void lenv_put(lenv* e, const lval* k, const lval* v) {

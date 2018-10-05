@@ -30,7 +30,7 @@ lval* lval_sym(const char* s);
 lval* lval_fun(const lbuiltin func);
 lval* lval_sexpr(void);
 lval* lval_qexpr(void);
-lval* lval_err(const char* m);
+lval* lval_err(char* fmt, ...);
 
 void lval_del(lval* v);
 
