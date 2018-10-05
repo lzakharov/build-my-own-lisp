@@ -128,6 +128,19 @@ lval* builtin_def(lenv* e, lval* a) {
   return lval_sexpr();
 }
 
+lval* builtin_locals(lenv* e, lval* a) {
+  lval* locals = lval_qexpr();
+
+  for (int i = 0; i < e->count; ++i) {
+    lval* v = lval_qexpr();
+    lval_add(v, lval_sym(e->syms[i]));
+    lval_add(v, lval_copy(e->vals[i]));
+    lval_add(locals, v);
+  }
+
+  return locals;
+}
+
 lval* builtin_exit(lenv* e, lval* a) {
   lval_del(a); 
   lenv_del(e);
