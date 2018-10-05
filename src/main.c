@@ -44,6 +44,7 @@ int main(int argc, char** argv) {
     free(input);
   }
 
+  lenv_del(e);
   parser_cleanup(g);
 
   return 0;

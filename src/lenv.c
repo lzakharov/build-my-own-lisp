@@ -70,4 +70,6 @@ void lenv_add_builtins(lenv* e) {
   lenv_add_builtin(e, "join", builtin_join);
 
   lenv_add_builtin(e, "def", builtin_def);
+
+  lenv_add_builtin(e, "exit", builtin_exit);
 }

@@ -127,3 +127,9 @@ lval* builtin_def(lenv* e, lval* a) {
   lval_del(a);
   return lval_sexpr();
 }
+
+lval* builtin_exit(lenv* e, lval* a) {
+  lval_del(a); 
+  lenv_del(e);
+  exit(0);
+}
