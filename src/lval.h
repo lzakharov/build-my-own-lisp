@@ -2,21 +2,32 @@
 #define LVAL_H
 
 #include "mpc.h"
+#include "lenv.h"
 
-typedef enum { LVAL_NUM, LVAL_SYM, LVAL_SEXPR, LVAL_QEXPR, LVAL_ERR } lval_t;
+struct lval;
+struct lenv;
+typedef struct lval lval;
+typedef struct lenv lenv;
 
-typedef struct lval {
+typedef enum { LVAL_NUM, LVAL_SYM, LVAL_FUN,
+               LVAL_SEXPR, LVAL_QEXPR, LVAL_ERR } lval_t;
+
+typedef lval*(*lbuiltin)(const lenv*, lval*);
+
+struct lval {
   lval_t type;
   long num;
   char* sym;
+  lbuiltin fun;
   char* err;
   
   int count;
   struct lval** cell;
-} lval;
+};
 
 lval* lval_num(const long x);
 lval* lval_sym(const char* s);
+lval* lval_fun(const lbuiltin func);
 lval* lval_sexpr(void);
 lval* lval_qexpr(void);
 lval* lval_err(const char* m);
@@ -28,9 +39,10 @@ lval* lval_read(const mpc_ast_t* t);
 
 lval* lval_add(lval* v, const lval* x);
 lval* lval_join(lval* x, lval* y);
+lval* lval_copy(const lval* v);
 
-lval* lval_eval_sexpr(lval* v);
-lval* lval_eval(lval* v);
+lval* lval_eval_sexpr(const lenv* e, lval* v);
+lval* lval_eval(const lenv* e, lval* v);
 lval* lval_pop(lval* v, const int i);
 lval* lval_take(lval* v, const int i);
 

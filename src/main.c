@@ -1,6 +1,8 @@
 #include <stdlib.h>
 
 #include "parser.h"
+#include "lenv.h"
+#include "builtin.h"
 #include "lval.h"
 
 #ifdef _WIN32
@@ -25,32 +27,38 @@ void add_history(char* input) {}
 #include <editline/history.h>
 #endif
 
-void read_eval_print(const parser_grammar* g, const char* input);
+void info(void);
+void read_eval_print(const parser_grammar* g, lenv* e, const char* input);
 
 int main(int argc, char** argv) {
   parser_grammar* g = parser_init();
+  lenv* e = lenv_new();
+  lenv_add_builtins(e);
 
-  puts("Lispy Version 0.0.0.0.6");
-  puts("Press Ctrl+C to Exit\n");
+  info();
 
   while (1) {
     char* input = readline("lispy> ");
     add_history(input);
-
-    read_eval_print(g, input);
-
+    read_eval_print(g, e, input);
     free(input);
   }
 
   parser_cleanup(g);
+
   return 0;
 }
 
-void read_eval_print(const parser_grammar* g, const char* input) {
+void info(void) {
+  puts("Lispy Version 0.0.0.0.6");
+  puts("Press Ctrl+C to Exit\n");
+}
+
+void read_eval_print(const parser_grammar* g, lenv* e, const char* input) {
   mpc_result_t r;
 
   if (parser_parse("<stdin>", input, g, &r)) {
-    lval* x = lval_eval(lval_read(r.output)); 
+    lval* x = lval_eval(e, lval_read(r.output)); 
     lval_println(x);
     lval_del(x);
     mpc_ast_delete(r.output);

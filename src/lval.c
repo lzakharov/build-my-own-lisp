@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include "mpc.h"
+#include "lenv.h"
 #include "builtin.h"
 
 lval* lval_num(const long x) {
@@ -18,6 +19,13 @@ lval* lval_sym(const char* s) {
   v->type = LVAL_SYM;
   v->sym = malloc(strlen(s) + 1);
   strcpy(v->sym, s);
+  return v;
+}
+
+lval* lval_fun(const lbuiltin func) {
+  lval* v = malloc(sizeof(lval));
+  v->type = LVAL_FUN;
+  v->fun = func;
   return v;
 }
 
@@ -49,6 +57,7 @@ void lval_del(lval* v) {
   switch (v->type) {
   case LVAL_NUM: break;
   case LVAL_SYM: free(v->sym); break;
+  case LVAL_FUN: break;
   case LVAL_ERR: free(v->err); break;
   case LVAL_SEXPR:
   case LVAL_QEXPR:
@@ -95,7 +104,7 @@ lval* lval_read(const mpc_ast_t* t) {
 
 lval* lval_add(lval* v, const lval* x) {
   v->count++;
-  v->cell = realloc(v->cell, sizeof(lval) * v->count);
+  v->cell = realloc(v->cell, sizeof(lval*) * v->count);
   v->cell[v->count-1] = (lval*)x;
   return v;
 }
@@ -109,9 +118,37 @@ lval* lval_join(lval* x, lval* y) {
   return x;
 }
 
-lval* lval_eval_sexpr(lval* v) {
+lval* lval_copy(const lval* v) {
+  lval* x = malloc(sizeof(lval));
+  x->type = v->type;
+
+  switch (x->type) {
+  case LVAL_NUM: x->num = v->num; break;
+  case LVAL_FUN: x->fun = v->fun; break;
+  case LVAL_ERR:
+    x->err = malloc(strlen(v->err) + 1);
+    strcpy(x->err, v->err);
+    break;
+  case LVAL_SYM:
+    x->sym = malloc(strlen(v->sym) + 1);
+    strcpy(x->sym, v->sym);
+    break;
+  case LVAL_SEXPR:
+  case LVAL_QEXPR:
+    x->count = v->count;
+    x->cell = malloc(sizeof(lval*) * x->count);
+    for (int i = 0; i < x->count; ++x) {
+      x->cell[i] = v->cell[i];
+    }
+    break;
+  }
+
+  return x;
+}
+
+lval* lval_eval_sexpr(const lenv* e, lval* v) {
   for (int i = 0; i < v->count; ++i) {
-    v->cell[i] = lval_eval(v->cell[i]);
+    v->cell[i] = lval_eval(e, v->cell[i]);
   }
   
   for (int i = 0; i < v->count; ++i) {
@@ -122,27 +159,33 @@ lval* lval_eval_sexpr(lval* v) {
   if (v->count == 1) { return lval_take(v, 0); }
 
   lval* f = lval_pop(v, 0);
-  if (f->type != LVAL_SYM) {
+  if (f->type != LVAL_FUN) {
     lval_del(f); lval_del(v);
-    return lval_err("S-expression Does not start with symbol!");
+    return lval_err("first element is not a function");
   }
 
-  lval* result = builtin(v, f->sym);
+  lval* result = f->fun(e, v);
   lval_del(f);
   return result;
 }
 
-lval* lval_eval(lval* v) {
-  if (v->type == LVAL_SEXPR) { return lval_eval_sexpr(v); }
+lval* lval_eval(const lenv* e, lval* v) {
+  if (v->type == LVAL_SYM) {
+    lval* x = lenv_get(e, v);
+    lval_del(v);
+    return x;
+  }
+
+  if (v->type == LVAL_SEXPR) { return lval_eval_sexpr(e, v); }
   return v;
 }
 
 lval* lval_pop(lval* v, const int i) {
   lval* x = v->cell[i];
 
-  memmove(&v->cell[i], &v->cell[i+1], sizeof(lval) * (v->count-i-1));
+  memmove(&v->cell[i], &v->cell[i+1], sizeof(lval*) * (v->count-i-1));
   v->count--;
-  v->cell = realloc(v->cell, sizeof(lval) * v->count);
+  v->cell = realloc(v->cell, sizeof(lval*) * v->count);
 
   return x;
 }
@@ -171,6 +214,7 @@ void lval_print(const lval* v) {
   switch (v->type) {
   case LVAL_NUM: printf("%li", v->num); break;
   case LVAL_SYM: printf("%s", v->sym); break;
+  case LVAL_FUN: printf("<function>"); break;
   case LVAL_SEXPR: lval_expr_print(v, '(', ')'); break;
   case LVAL_QEXPR: lval_expr_print(v, '{', '}'); break;
   case LVAL_ERR: printf("Error: %s", v->err); break;
