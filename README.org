@@ -20,7 +20,7 @@
    - [X] Chapter 9 • S-Expressions
    - [X] Chapter 10 • Q-Expressions
    - [X] Chapter 11 • Variables
-   - [ ] Chapter 12 • Functions
+   - [X] Chapter 12 • Functions
    - [ ] Chapter 13 • Conditionals
    - [ ] Chapter 14 • Strings
    - [ ] Chapter 15 • Standard Library
