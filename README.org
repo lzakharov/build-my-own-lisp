@@ -55,25 +55,30 @@
    18
    #+END_SRC
    
-   Comparison operations and ~If~ statements:
+   Comparison operations:
    #+BEGIN_SRC 
    lispy> > 3 1
    1
-   lispy> def {x y} 100 200
+   #+END_SRC
+   
+   Logical operators:
+   #+BEGIN_SRC 
+   lispy> def {x y z} 1 2 3
    ()
-   lispy> if (== x y) {+ x y} {- x y}
-   -100
+   lispy> if (or (== x y) (>= z y)) {+ x y} {- x y}
+   3
    #+END_SRC
    
    Get local environment:
    #+BEGIN_SRC
    lispy> locals {}
-   {{+ <builtin>} {- <builtin>} {* <builtin>} {/ <builtin>} {if
-   <builtin>} {> <builtin>} {>= <builtin>} {< <builtin>} {<= <builtin>}
-   {== <builtin>} {!= <builtin>} {list <builtin>} {head <builtin>} {tail
-   <builtin>} {eval <builtin>} {join <builtin>} {def <builtin>} {\
-   <builtin>} {fun <builtin>} {= <builtin>} {locals <builtin>} {exit
-   <builtin>}}
+   {{+ <builtin>} {- <builtin>} {* <builtin>} {/ <builtin>}
+    {> <builtin>} {>= <builtin>} {< <builtin>} {<= <builtin>}
+    {== <builtin>} {!= <builtin>} {if <builtin>} {or <builtin>} 
+    {and <builtin>} {not <builtin>} {list <builtin>} {head <builtin>}
+    {tail <builtin>} {eval <builtin>} {join <builtin>} {def <builtin>}
+    {\ <builtin>} {fun <builtin>} {= <builtin>} {locals <builtin>}
+    {exit <builtin>}}
    #+END_SRC
    
    Exit function (or use ~Ctrl+C~):
@@ -95,7 +100,7 @@
    - [X] Chapter 10 • Q-Expressions
    - [X] Chapter 11 • Variables
    - [X] Chapter 12 • Functions
-   - [ ] Chapter 13 • Conditionals
+   - [X] Chapter 13 • Conditionals
    - [ ] Chapter 14 • Strings
    - [ ] Chapter 15 • Standard Library
    - [ ] Chapter 16 • Bonus Projects
