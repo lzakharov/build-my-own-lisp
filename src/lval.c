@@ -133,10 +133,11 @@ lval* lval_read(const mpc_ast_t* t) {
   for (int i = 0; i < t->children_num; ++i) {
     mpc_ast_t* child = t->children[i];
     if (strcmp(child->contents, "(") == 0 ||
-  	strcmp(child->contents, ")") == 0 ||
-  	strcmp(child->contents, "{") == 0 ||
-  	strcmp(child->contents, "}") == 0 ||
-  	strcmp(child->tag, "regex") == 0) {
+        strcmp(child->contents, ")") == 0 ||
+        strcmp(child->contents, "{") == 0 ||
+        strcmp(child->contents, "}") == 0 ||
+        strcmp(child->tag, "regex") == 0 ||
+        strstr(child->tag, "comment")) {
       continue;
     }
     x = lval_add(x, lval_read(child));
