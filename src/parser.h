@@ -30,6 +30,7 @@ static parser_grammar* g;
 void parser_init(void);
 int parser_parse(const char* filename, const char* string,
                  mpc_result_t* r);
+int parser_parse_contents(const char* filename, mpc_result_t* r);
 void parser_cleanup(void);
 
 #endif

@@ -118,6 +118,8 @@ void lenv_add_builtins(lenv* e) {
   lenv_add_builtin(e, "=",   builtin_put);
   lenv_add_builtin(e, "locals", builtin_locals);
 
+  lenv_add_builtin(e, "load", builtin_load);
+
   /* System Functions */
   lenv_add_builtin(e, "exit", builtin_exit);
 }

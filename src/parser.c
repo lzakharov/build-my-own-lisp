@@ -21,6 +21,10 @@ int parser_parse(const char* filename, const char* string,
   return mpc_parse(filename, string, g->lispy, r);
 }
 
+int parser_parse_contents(const char* filename, mpc_result_t* r) {
+  return mpc_parse_contents(filename, g->lispy, r);
+}
+
 void parser_cleanup(void) {
   mpc_cleanup(8, g->number, g->symbol, g->string, g->comment,
               g->sexpr, g->qexpr, g->expr, g->lispy);
