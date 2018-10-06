@@ -133,6 +133,29 @@ lval* builtin_if(lenv* e, lval* a) {
   return x;
 }
 
+lval* builtin_or(lenv* e, lval* a) {
+  LASSERT_NUM("or", a, 2);
+  LASSERT_TYPE("or", a, 0, LVAL_NUM);
+  LASSERT_TYPE("or", a, 1, LVAL_NUM);
+
+  return lval_num(a->cell[0]->num || a->cell[1]->num);
+}
+
+lval* builtin_and(lenv* e, lval* a) {
+  LASSERT_NUM("and", a, 2);
+  LASSERT_TYPE("and", a, 0, LVAL_NUM);
+  LASSERT_TYPE("and", a, 1, LVAL_NUM);
+
+  return lval_num(a->cell[0]->num && a->cell[1]->num);
+}
+
+lval* builtin_not(lenv* e, lval* a) {
+  LASSERT_NUM("not", a, 1);
+  LASSERT_TYPE("not", a, 0, LVAL_NUM);
+
+  return lval_num(!a->cell[0]->num);
+}
+
 lval* builtin_list(lenv* e, lval* a) {
   a->type = LVAL_QEXPR;
   return a;
