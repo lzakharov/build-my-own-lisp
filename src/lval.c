@@ -23,10 +23,20 @@ lval* lval_sym(const char* s) {
   return v;
 }
 
-lval* lval_fun(const lbuiltin func) {
+lval* lval_builtin(const lbuiltin func) {
   lval* v = malloc(sizeof(lval));
   v->type = LVAL_FUN;
-  v->fun = func;
+  v->builtin = func;
+  return v;
+}
+
+lval* lval_lambda(lval* formals, lval* body) {
+  lval* v = malloc(sizeof(lval));
+  v->type = LVAL_FUN;
+  v->builtin = NULL;
+  v->env = lenv_new();
+  v->formals = formals;
+  v->body = body;
   return v;
 }
 
@@ -65,7 +75,13 @@ void lval_del(lval* v) {
   switch (v->type) {
   case LVAL_NUM: break;
   case LVAL_SYM: free(v->sym); break;
-  case LVAL_FUN: break;
+  case LVAL_FUN:
+    if (!v->builtin) {
+      lenv_del(v->env);
+      lval_del(v->formals);
+      lval_del(v->body);
+    }
+    break;
   case LVAL_ERR: free(v->err); break;
   case LVAL_SEXPR:
   case LVAL_QEXPR:
@@ -132,7 +148,16 @@ lval* lval_copy(const lval* v) {
 
   switch (x->type) {
   case LVAL_NUM: x->num = v->num; break;
-  case LVAL_FUN: x->fun = v->fun; break;
+  case LVAL_FUN:
+    if (v->builtin) {
+      x->builtin = v->builtin;
+    } else {
+      x->builtin = NULL;
+      x->env = lenv_copy(v->env);
+      x->formals = lval_copy(v->formals);
+      x->body = lval_copy(v->body);
+    }
+    break;
   case LVAL_ERR:
     x->err = malloc(strlen(v->err) + 1);
     strcpy(x->err, v->err);
@@ -154,17 +179,55 @@ lval* lval_copy(const lval* v) {
   return x;
 }
 
+lval* lval_call(lenv* e, lval* f, lval* a) {
+  if (f->builtin) {
+    return f->builtin(e, a);
+  }
+
+  int given = a->count;
+  int total = f->formals->count;
+
+  while (a->count) {
+    if (f->formals->count == 0) {
+      lval_del(a); return lval_err("Function passed too many arguments. "
+                                   "Got %i, Expected %i.", given, total);
+    }
+
+    lval* sym = lval_pop(f->formals, 0);
+    lval* val = lval_pop(a, 0);
+    lenv_put(f->env, sym, val);
+    lval_del(sym);
+    lval_del(val);
+  }
+
+  lval_del(a);
+
+  if (f->formals->count == 0) {
+    f->env->par = e;
+    return builtin_eval(
+      f->env, lval_add(lval_sexpr(), lval_copy(f->body)));
+  } 
+
+  return lval_copy(f);
+}
+
 lval* lval_eval_sexpr(lenv* e, lval* v) {
   for (int i = 0; i < v->count; ++i) {
     v->cell[i] = lval_eval(e, v->cell[i]);
   }
   
   for (int i = 0; i < v->count; ++i) {
-    if (v->cell[i]->type == LVAL_ERR) { return lval_take(v, i); }
+    if (v->cell[i]->type == LVAL_ERR) {
+      return lval_take(v, i);
+    }
   }
 
-  if (v->count == 0) { return v; }
-  if (v->count == 1) { return lval_take(v, 0); }
+  if (v->count == 0) {
+    return v;
+  }
+  if (v->count == 1) {
+    return lval_eval(e, lval_take(v, 0));
+  }
 
   lval* f = lval_pop(v, 0);
   if (f->type != LVAL_FUN) {
@@ -176,7 +239,7 @@ lval* lval_eval_sexpr(lenv* e, lval* v) {
     return err;
   }
 
-  lval* result = f->fun(e, v);
+  lval* result = lval_call(e, f, v);
   lval_del(f);
   return result;
 }
@@ -188,7 +251,10 @@ lval* lval_eval(lenv* e, lval* v) {
     return x;
   }
 
-  if (v->type == LVAL_SEXPR) { return lval_eval_sexpr(e, v); }
+  if (v->type == LVAL_SEXPR) {
+    return lval_eval_sexpr(e, v);
+  }
+
   return v;
 }
 
@@ -208,7 +274,7 @@ lval* lval_take(lval* v, const int i) {
   return x;
 }
 
-void lval_expr_print(const lval* v, const char open, const char close) {
+void lval_print_expr(const lval* v, const char open, const char close) {
   putchar(open);
 
   for (int i = 0; i < v->count; ++i) {
@@ -226,9 +292,19 @@ void lval_print(const lval* v) {
   switch (v->type) {
   case LVAL_NUM: printf("%li", v->num); break;
   case LVAL_SYM: printf("%s", v->sym); break;
-  case LVAL_FUN: printf("<function>"); break;
-  case LVAL_SEXPR: lval_expr_print(v, '(', ')'); break;
-  case LVAL_QEXPR: lval_expr_print(v, '{', '}'); break;
+  case LVAL_FUN:
+    if (v->builtin) {
+      printf("<builtin>");
+    } else {
+      printf("(\\ ");
+      lval_print(v->formals);
+      putchar(' ');
+      lval_print(v->body);
+      putchar(')');
+    }
+    break;
+  case LVAL_SEXPR: lval_print_expr(v, '(', ')'); break;
+  case LVAL_QEXPR: lval_print_expr(v, '{', '}'); break;
   case LVAL_ERR: printf("Error: %s", v->err); break;
   }
 }

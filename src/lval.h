@@ -16,18 +16,27 @@ typedef lval*(*lbuiltin)(lenv*, lval*);
 
 struct lval {
   lval_t type;
+
+  /* Basics */
   long num;
   char* sym;
-  lbuiltin fun;
   char* err;
   
+  /* Function */
+  lbuiltin builtin;
+  lenv* env;
+  lval* formals;
+  lval* body;
+
+  /* Expression */
   int count;
   struct lval** cell;
 };
 
 lval* lval_num(const long x);
 lval* lval_sym(const char* s);
-lval* lval_fun(const lbuiltin func);
+lval* lval_builtin(const lbuiltin func);
+lval* lval_lambda(lval* formals, lval* body);
 lval* lval_sexpr(void);
 lval* lval_qexpr(void);
 lval* lval_err(char* fmt, ...);
@@ -41,12 +50,13 @@ lval* lval_add(lval* v, const lval* x);
 lval* lval_join(lval* x, lval* y);
 lval* lval_copy(const lval* v);
 
+lval* lval_call(lenv* e, lval* f, lval* a);
 lval* lval_eval_sexpr(lenv* e, lval* v);
 lval* lval_eval(lenv* e, lval* v);
 lval* lval_pop(lval* v, const int i);
 lval* lval_take(lval* v, const int i);
 
-void lval_expr_print(const lval* v, const char open, const char close);
+void lval_print_expr(const lval* v, const char open, const char close);
 void lval_print(const lval* v);
 void lval_println(const lval* v);
 
