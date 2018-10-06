@@ -113,6 +113,22 @@ lval* builtin_put(lenv* e, lval* a) {
   return builtin_var(e, a, "=");
 }
 
+lval* builtin_fun(lenv* e, lval* a) {
+  LASSERT_NUM("fun", a, 2);
+  LASSERT_TYPE("fun", a, 0, LVAL_QEXPR);
+  LASSERT_TYPE("fun", a, 1, LVAL_QEXPR);
+  LASSERT_NOT_EMPTY("fun", a, 0);
+
+  lval* name = lval_pop(a->cell[0], 0);
+  lval* args = lval_copy(a->cell[0]);
+  lval* body = lval_copy(a->cell[1]);
+
+  lenv_def(e, name, lval_lambda(args, body));
+
+  lval_del(a);
+  return lval_sexpr();
+}
+
 lval* builtin_var(lenv* e, lval* a, const char* func) {
   LASSERT_TYPE(func, a, 0, LVAL_QEXPR);
 

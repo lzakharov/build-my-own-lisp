@@ -41,6 +41,7 @@ lval* builtin_eval(lenv* e, lval* a);
 /* Variable Functions */
 lval* builtin_def(lenv* e, lval* a);
 lval* builtin_put(lenv* e, lval* a);
+lval* builtin_fun(lenv* e, lval* a);
 lval* builtin_var(lenv* e, lval* a, const char* func);
 lval* builtin_lambda(lenv* e, lval* a);
 lval* builtin_locals(lenv* e, lval* a);
