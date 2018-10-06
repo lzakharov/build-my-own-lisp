@@ -6,14 +6,16 @@
 static const char* LANG =
   "number   : /-?[0-9]+/ ;"
   "symbol   : /[a-zA-Z0-9_+\\-*\\/\\\\=<>!&]+/ ;"
+  "string   : /\"(\\\\.|[^\"])*\"/ ;"
   "sexpr    : '(' <expr>* ')' ;"
   "qexpr    : '{' <expr>* '}' ;"
-  "expr     : <number> | <symbol> | <sexpr> | <qexpr> ;"
+  "expr     : <number> | <symbol> | <string> | <sexpr> | <qexpr> ;"
   "lispy    : /^/ <expr>* /$/ ;";
 
 typedef struct {
     mpc_parser_t* number;
     mpc_parser_t* symbol;
+    mpc_parser_t* string;
     mpc_parser_t* sexpr;
     mpc_parser_t* qexpr;
     mpc_parser_t* expr;

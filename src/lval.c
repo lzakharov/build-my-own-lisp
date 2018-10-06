@@ -23,6 +23,29 @@ lval* lval_sym(const char* s) {
   return v;
 }
 
+lval* lval_err(char* fmt, ...) {
+  lval* v = malloc(sizeof(lval));
+  v->type = LVAL_ERR;
+
+  va_list va;
+  va_start(va, fmt);
+
+  v->err = malloc(512);
+  vsnprintf(v->err, 511, fmt, va);
+  v->err = realloc(v->err, strlen(v->err) + 1);
+  va_end(va);
+
+  return v;
+}
+
+lval* lval_str(const char* s) {
+  lval* v = malloc(sizeof(lval));
+  v->type = LVAL_STR;
+  v->str = malloc(strlen(s) + 1);
+  strcpy(v->str, s);
+  return v;
+}
+
 lval* lval_builtin(const lbuiltin func) {
   lval* v = malloc(sizeof(lval));
   v->type = LVAL_FUN;
@@ -56,25 +79,12 @@ lval* lval_qexpr(void) {
   return v;
 }
 
-lval* lval_err(char* fmt, ...) {
-  lval* v = malloc(sizeof(lval));
-  v->type = LVAL_ERR;
-
-  va_list va;
-  va_start(va, fmt);
-
-  v->err = malloc(512);
-  vsnprintf(v->err, 511, fmt, va);
-  v->err = realloc(v->err, strlen(v->err) + 1);
-  va_end(va);
-
-  return v;
-}
-
 void lval_del(lval* v) {
   switch (v->type) {
   case LVAL_NUM: break;
   case LVAL_SYM: free(v->sym); break;
+  case LVAL_ERR: free(v->err); break;
+  case LVAL_STR: free(v->str); break;
   case LVAL_FUN:
     if (!v->builtin) {
       lenv_del(v->env);
@@ -82,7 +92,6 @@ void lval_del(lval* v) {
       lval_del(v->body);
     }
     break;
-  case LVAL_ERR: free(v->err); break;
   case LVAL_SEXPR:
   case LVAL_QEXPR:
     for (int i = 0; i < v->count; ++i) {
@@ -101,9 +110,19 @@ lval* lval_read_num(const mpc_ast_t* t) {
   return errno != ERANGE ? lval_num(x) : lval_err("invalid number");
 }
 
+lval* lval_read_str(const mpc_ast_t* t) {
+  t->contents[strlen(t->contents)-1] = '\0';
+  char* unescaped = malloc(strlen(t->contents + 1) + 1);
+  strcpy(unescaped, t->contents + 1);
+  unescaped = mpcf_unescape(unescaped);
+  lval* str = lval_str(unescaped);
+  free(unescaped);
+  return str;}
+
 lval* lval_read(const mpc_ast_t* t) {
   if (strstr(t->tag, "number")) { return lval_read_num(t); }
   if (strstr(t->tag, "symbol")) { return lval_sym(t->contents); }
+  if (strstr(t->tag, "string")) { return lval_read_str(t); }
 
   lval* x = NULL;
   if (strcmp(t->tag, ">") == 0 || strstr(t->tag, "sexpr")) {
@@ -135,6 +154,7 @@ int lval_eq(const lval* x, const lval* y) {
   case LVAL_NUM: return (x->num == y->num); break;
   case LVAL_SYM: return (strcmp(x->sym, y->sym) == 0); break;
   case LVAL_ERR: return (strcmp(x->err, y->err) == 0); break;
+  case LVAL_STR: return (strcmp(x->str, y->str) == 0); break;
   case LVAL_FUN:
     if (x->builtin || y->builtin) {
       return x->builtin == y->builtin;
@@ -179,6 +199,18 @@ lval* lval_copy(const lval* v) {
 
   switch (x->type) {
   case LVAL_NUM: x->num = v->num; break;
+  case LVAL_SYM:
+    x->sym = malloc(strlen(v->sym) + 1);
+    strcpy(x->sym, v->sym);
+    break;
+  case LVAL_ERR:
+    x->err = malloc(strlen(v->err) + 1);
+    strcpy(x->err, v->err);
+    break;
+  case LVAL_STR:
+    x->str = malloc(strlen(v->str) + 1);
+    strcpy(x->str, v->str);
+    break;
   case LVAL_FUN:
     if (v->builtin) {
       x->builtin = v->builtin;
@@ -188,14 +220,6 @@ lval* lval_copy(const lval* v) {
       x->formals = lval_copy(v->formals);
       x->body = lval_copy(v->body);
     }
-    break;
-  case LVAL_ERR:
-    x->err = malloc(strlen(v->err) + 1);
-    strcpy(x->err, v->err);
-    break;
-  case LVAL_SYM:
-    x->sym = malloc(strlen(v->sym) + 1);
-    strcpy(x->sym, v->sym);
     break;
   case LVAL_SEXPR:
   case LVAL_QEXPR:
@@ -338,6 +362,14 @@ lval* lval_take(lval* v, const int i) {
   return x;
 }
 
+void lval_print_str(const lval* v) {
+  char* escaped = malloc(strlen(v->str) + 1);
+  strcpy(escaped, v->str);
+  escaped = mpcf_escape(escaped);
+  printf("\"%s\"", escaped);
+  free(escaped);
+}
+
 void lval_print_expr(const lval* v, const char open, const char close) {
   putchar(open);
 
@@ -356,6 +388,8 @@ void lval_print(const lval* v) {
   switch (v->type) {
   case LVAL_NUM: printf("%li", v->num); break;
   case LVAL_SYM: printf("%s", v->sym); break;
+  case LVAL_ERR: printf("Error: %s", v->err); break;
+  case LVAL_STR: lval_print_str(v); break;
   case LVAL_FUN:
     if (v->builtin) {
       printf("<builtin>");
@@ -369,7 +403,6 @@ void lval_print(const lval* v) {
     break;
   case LVAL_SEXPR: lval_print_expr(v, '(', ')'); break;
   case LVAL_QEXPR: lval_print_expr(v, '{', '}'); break;
-  case LVAL_ERR: printf("Error: %s", v->err); break;
   }
 }
 
