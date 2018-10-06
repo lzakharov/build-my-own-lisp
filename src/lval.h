@@ -46,6 +46,8 @@ void lval_del(lval* v);
 lval* lval_read_num(const mpc_ast_t* t);
 lval* lval_read(const mpc_ast_t* t);
 
+int lval_eq(const lval* x, const lval* y);
+
 lval* lval_add(lval* v, const lval* x);
 lval* lval_join(lval* x, lval* y);
 lval* lval_copy(const lval* v);

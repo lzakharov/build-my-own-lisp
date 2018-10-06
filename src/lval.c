@@ -126,6 +126,37 @@ lval* lval_read(const mpc_ast_t* t) {
   return x;
 }
 
+int lval_eq(const lval* x, const lval* y) {
+  if (x->type != y->type) {
+    return 0;
+  }
+
+  switch (x->type) {
+  case LVAL_NUM: return (x->num == y->num); break;
+  case LVAL_SYM: return (strcmp(x->sym, y->sym) == 0); break;
+  case LVAL_ERR: return (strcmp(x->err, y->err) == 0); break;
+  case LVAL_FUN:
+    if (x->builtin || y->builtin) {
+      return x->builtin == y->builtin;
+    } else {
+      return lval_eq(x->formals, y->formals) && lval_eq(x->body, y->body);
+    }
+  case LVAL_SEXPR:
+  case LVAL_QEXPR:
+    if (x->count != y->count) {
+      return 0;
+    }
+    for (int i = 0; i < x->count; ++i) {
+      if (!lval_eq(x->cell[i], y->cell[i])) {
+        return 0;
+      }
+    }
+    return 1;
+  }
+
+  return 0;   
+}
+
 lval* lval_add(lval* v, const lval* x) {
   v->count++;
   v->cell = realloc(v->cell, sizeof(lval*) * v->count);
