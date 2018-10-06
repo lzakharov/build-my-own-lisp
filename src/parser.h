@@ -25,9 +25,11 @@ typedef struct {
   mpc_parser_t* lispy;
 } parser_grammar;
 
-parser_grammar* parser_init(void);
+static parser_grammar* g;
+
+void parser_init(void);
 int parser_parse(const char* filename, const char* string,
-                 const parser_grammar* g, mpc_result_t* r);
-void parser_cleanup(parser_grammar* g);
+                 mpc_result_t* r);
+void parser_cleanup(void);
 
 #endif

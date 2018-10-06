@@ -28,10 +28,10 @@ void add_history(char* input) {}
 #endif
 
 void info(void);
-void read_eval_print(const parser_grammar* g, lenv* e, const char* input);
+void read_eval_print(lenv* e, const char* input);
 
 int main(int argc, char** argv) {
-  parser_grammar* g = parser_init();
+  parser_init();
   lenv* e = lenv_new();
   lenv_add_builtins(e);
 
@@ -40,12 +40,12 @@ int main(int argc, char** argv) {
   while (1) {
     char* input = readline("lispy> ");
     add_history(input);
-    read_eval_print(g, e, input);
+    read_eval_print(e, input);
     free(input);
   }
 
   lenv_del(e);
-  parser_cleanup(g);
+  parser_cleanup();
 
   return 0;
 }
@@ -55,10 +55,10 @@ void info(void) {
   puts("Press Ctrl+C to Exit\n");
 }
 
-void read_eval_print(const parser_grammar* g, lenv* e, const char* input) {
+void read_eval_print(lenv* e, const char* input) {
   mpc_result_t r;
 
-  if (parser_parse("<stdin>", input, g, &r)) {
+  if (parser_parse("<stdin>", input, &r)) {
     lval* x = lval_eval(e, lval_read(r.output)); 
     lval_println(x);
     lval_del(x);
