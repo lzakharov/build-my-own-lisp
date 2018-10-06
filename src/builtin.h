@@ -31,6 +31,13 @@ lval* builtin_sub(lenv* e, lval* a);
 lval* builtin_mul(lenv* e, lval* a);
 lval* builtin_div(lenv* e, lval* a);
 
+/* Comparison Functions */
+lval* builtin_ord(const lenv* e, lval* a, const char* op);
+lval* builtin_gt(lenv* e, lval* a);
+lval* builtin_ge(lenv* e, lval* a);
+lval* builtin_lt(lenv* e, lval* a);
+lval* builtin_le(lenv* e, lval* a);
+
 /* List Functions */
 lval* builtin_list(lenv* e, lval* a);
 lval* builtin_head(lenv* e, lval* a);

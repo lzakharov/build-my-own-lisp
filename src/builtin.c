@@ -53,6 +53,45 @@ lval* builtin_div(lenv* e, lval* a) {
   return builtin_op(e, a, "/");
 }
 
+lval* builtin_ord(const lenv* e, lval* a, const char* op) {
+  LASSERT_NUM(op, a, 2);
+  LASSERT_TYPE(op, a, 0, LVAL_NUM);
+  LASSERT_TYPE(op, a, 1, LVAL_NUM);
+
+  int x;
+  if (strcmp(op, ">") == 0) {
+    x = (a->cell[0]->num > a->cell[1]->num);
+  }
+  if (strcmp(op, ">=") == 0) {
+    x = (a->cell[0]->num >= a->cell[1]->num);
+  }
+  if (strcmp(op, "<") == 0) {
+    x = (a->cell[0]->num < a->cell[1]->num);
+  }
+  if (strcmp(op, "<=") == 0) {
+    x = (a->cell[0]->num <= a->cell[1]->num);
+  }
+
+  lval_del(a);
+  return lval_num(x);
+}
+
+lval* builtin_gt(lenv* e, lval* a) {
+  return builtin_ord(e, a, ">");
+}
+
+lval* builtin_ge(lenv* e, lval* a) {
+  return builtin_ord(e, a, ">=");
+}
+
+lval* builtin_lt(lenv* e, lval* a) {
+  return builtin_ord(e, a, "<");
+}
+
+lval* builtin_le(lenv* e, lval* a) {
+  return builtin_ord(e, a, "<=");
+}
+
 lval* builtin_list(lenv* e, lval* a) {
   a->type = LVAL_QEXPR;
   return a;
