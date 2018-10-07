@@ -27,5 +27,6 @@ void lenv_def(lenv* e, const lval* k, const lval* v);
 
 void lenv_add_builtin(lenv* e, const char* name, const lbuiltin func);
 void lenv_add_builtins(lenv* e);
+void lenv_load_file(lenv* e, const char* filename);
 
 #endif

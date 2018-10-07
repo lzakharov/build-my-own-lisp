@@ -125,3 +125,12 @@ void lenv_add_builtins(lenv* e) {
   /* System Functions */
   lenv_add_builtin(e, "exit", builtin_exit);
 }
+
+void lenv_load_file(lenv* e, const char* filename) {
+  printf("Loading '%s'\n", filename);
+  lval* args = lval_add(lval_sexpr(), lval_str(filename));
+  lval* x = builtin_load(e, args);
+  if (x->type == LVAL_ERR) {
+    lval_println(x);
+  }
+}

@@ -34,6 +34,7 @@ int main(int argc, char** argv) {
   parser_init();
   lenv* e = lenv_new();
   lenv_add_builtins(e);
+  lenv_load_file(e, "src/prelude.lspy");
 
   if (argc == 1) {
     info();
