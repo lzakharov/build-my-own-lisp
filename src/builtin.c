@@ -318,7 +318,6 @@ lval* builtin_load(lenv* e, lval* a) {
     lval_del(expr);
     lval_del(a);
 
-    /* Return empty list */
     return lval_sexpr();
 
   } else {
@@ -331,6 +330,28 @@ lval* builtin_load(lenv* e, lval* a) {
 
     return err;
   }
+}
+
+lval* builtin_print(lenv* e, lval* a) {
+  for (int i = 0; i < a->count; i++) {
+    lval_print(a->cell[i]);
+    putchar(' ');
+  }
+
+  putchar('\n');
+  lval_del(a);
+
+  return lval_sexpr();
+}
+
+lval* builtin_error(lenv* e, lval* a) {
+  LASSERT_NUM("error", a, 1);
+  LASSERT_TYPE("error", a, 0, LVAL_STR);
+
+  lval* err = lval_err(a->cell[0]->str);
+
+  lval_del(a);
+  return err;
 }
 
 lval* builtin_exit(lenv* e, lval* a) {

@@ -35,13 +35,25 @@ int main(int argc, char** argv) {
   lenv* e = lenv_new();
   lenv_add_builtins(e);
 
-  info();
+  if (argc == 1) {
+    info();
+    while (1) {
+      char* input = readline("lispy> ");
+      add_history(input);
+      read_eval_print(e, input);
+      free(input);
+    }
+  }
 
-  while (1) {
-    char* input = readline("lispy> ");
-    add_history(input);
-    read_eval_print(e, input);
-    free(input);
+  if (argc >= 2) {
+    for (int i = 1; i < argc; i++) {
+
+      lval* args = lval_add(lval_sexpr(), lval_str(argv[i]));
+      lval* x = builtin_load(e, args);
+
+      if (x->type == LVAL_ERR) { lval_println(x); }
+      lval_del(x);
+    }
   }
 
   lenv_del(e);
@@ -51,7 +63,7 @@ int main(int argc, char** argv) {
 }
 
 void info(void) {
-  puts("Lispy Version 0.0.0.0.6");
+  puts("Lispy Version 1.0");
   puts("Press Ctrl+C to Exit\n");
 }
 
