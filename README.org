@@ -116,6 +116,6 @@
    - [X] Chapter 12 • Functions
    - [X] Chapter 13 • Conditionals
    - [X] Chapter 14 • Strings
-   - [ ] Chapter 15 • Standard Library
+   - [X] Chapter 15 • Standard Library
    - [ ] Chapter 16 • Bonus Projects
 
