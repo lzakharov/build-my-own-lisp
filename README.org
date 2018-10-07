@@ -95,6 +95,14 @@
    ()
    #+END_SRC
    
+   Standard library functions:
+   #+BEGIN_SRC 
+   lispy> map (\ {x} {+ x 10}) {5 2 11}
+   {15 12 21}
+   lispy> filter (\ {x} {> x 2}) {5 2 11 -7 8 1}
+   {5 11 8}
+   #+END_SRC
+   
    Exit function (or use ~Ctrl+C~):
    #+BEGIN_SRC 
    lispy> exit {}
@@ -117,5 +125,5 @@
    - [X] Chapter 13 • Conditionals
    - [X] Chapter 14 • Strings
    - [X] Chapter 15 • Standard Library
-   - [ ] Chapter 16 • Bonus Projects
-
+   - [X] Chapter 16 • Bonus Projects
+   - 🚀 Work on improvements and new features...
