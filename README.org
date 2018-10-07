@@ -81,6 +81,20 @@
     {exit <builtin>}}
    #+END_SRC
    
+   Strings, comments and file execution
+   #+BEGIN_SRC bash
+   ./lispy hello.lspy
+   "Hello World!"
+   #+END_SRC
+   
+   or
+
+   #+BEGIN_SRC 
+   lispy> load "hello.lspy"
+   "Hello World!" 
+   ()
+   #+END_SRC
+   
    Exit function (or use ~Ctrl+C~):
    #+BEGIN_SRC 
    lispy> exit {}
@@ -101,7 +115,7 @@
    - [X] Chapter 11 • Variables
    - [X] Chapter 12 • Functions
    - [X] Chapter 13 • Conditionals
-   - [ ] Chapter 14 • Strings
+   - [X] Chapter 14 • Strings
    - [ ] Chapter 15 • Standard Library
    - [ ] Chapter 16 • Bonus Projects
 
